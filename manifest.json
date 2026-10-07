@@ -1,0 +1,16 @@
+{
+  "name": "NEC LabCare - CSE(ET)",
+  "short_name": "LabCare",
+  "description": "Narasaraopeta Engineering College Lab Complaint Portal",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1e3a8a",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2942/2942789.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
