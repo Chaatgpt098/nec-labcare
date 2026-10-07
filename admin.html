@@ -66,8 +66,19 @@ function login(){
 }
 function getComplaints(){ return JSON.parse(localStorage.getItem('nec_complaints')||'[]'); }
 function saveComplaints(c){ localStorage.setItem('nec_complaints', JSON.stringify(c)); }
-
-function render(){
+function addDemo(){
+  let c = JSON.parse(localStorage.getItem('nec_complaints')||'[]');
+  c.push({
+    lab: "CSE(ET)-3427 LAB",
+    pc: "05",
+    issue: "Mouse Not Working",
+    student: "Demo Student",
+    date: new Date().toLocaleString(),
+    status: "Pending"
+  });
+  localStorage.setItem('nec_complaints', JSON.stringify(c));
+  render();
+}function render(){
   let all=getComplaints();
   let filtered = currentRole==='HOD'? all : all.filter(c=> c.lab.trim()===STAFF_LAB[currentUser].trim());
   let html='';
@@ -94,6 +105,7 @@ function updateStatus(idx){
   all[idx].solvedAt=new Date().toLocaleString();
   saveComplaints(all);
   alert(`Status updated to ${newStatus} by ${currentUser}`);
+  <button onclick="addDemo()" style="background:green;margin-bottom:15px">+ Add Demo Complaint (Testing)</button>
   render();
 }
 </script>
