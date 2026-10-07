@@ -1,81 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEC(A) - Admin</title>
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e3a8a">
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
+<title>NEC LabCare Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui}
-body{background:#eef2ff;color:#111}
-.nav{background:linear-gradient(135deg,#1e3a8a,#0f172a);color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.college{line-height:1.3}
-.college b{font-size:17px}
-.college span{display:block;font-size:15px;font-weight:700;color:#93c5fd;margin-top:3px}
-.college small{font-size:12px;color:#cbd5e1}
-.nav a{color:#94a3b8;text-decoration:none;margin-left:14px;font-size:14px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.1)}
-.nav a.active{color:#fff;background:#3b82f6;font-weight:700}
-.container{max-width:900px;margin:24px auto;padding:0 14px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
-.stat{background:#fff;border-radius:16px;padding:18px;text-align:center;box-shadow:0 8px 30px rgba(30,58,138,.08);border:1px solid #e0e7ff}
-.stat b{font-size:28px;display:block;color:#1e3a8a}
-.card{background:#fff;border-radius:18px;padding:22px;box-shadow:0 8px 30px rgba(30,58,138,.08);border:1px solid #e0e7ff;margin-bottom:16px}
-select,input{padding:10px 12px;border:1.5px solid #cbd5e1;border-radius:10px;background:#f8fafc}
-button{padding:8px 14px;border-radius:8px;border:0;font-weight:700;cursor:pointer;font-size:13px}
-.btn-work{background:#dbeafe;color:#1e40af}.btn-solve{background:#dcfce7;color:#166534}.btn-del{background:#fee2e2;color:#991b1b}
-.badge{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700}
-.pending{background:#fef3c7;color:#92400e}.working{background:#dbeafe;color:#1e40af}.solved{background:#dcfce7;color:#166534}
-.complaint{border:1.5px solid #e0e7ff;border-radius:14px;padding:16px;margin-top:14px;background:#f8faff}
-.complaint img{max-width:100%;border-radius:12px;margin:10px 0;border:1px solid #ddd}
-.footer{text-align:center;color:#64748b;font-size:12px;margin:24px}
+body{font-family:Arial;background:#f1f5f9;margin:0;padding:15px}
+.card{background:white;padding:18px;border-radius:12px;box-shadow:0 2px 8px #0001;margin-bottom:12px}
+select,button{padding:8px 12px;border-radius:6px;border:1px solid #ccc}
+button{background:#1e3a8a;color:white;cursor:pointer;font-weight:bold}
+.badge{padding:4px 10px;border-radius:20px;font-size:12px}
+.pending{background:#fef3c7}.assigned{background:#dbeafe}.solved{background:#dcfce7}
+.login{max-width:420px;margin:60px auto;text-align:center}
+h2{color:#1e3a8a}
 </style>
 </head>
 <body>
-<div class="nav">
-<div class="college">
-<b>NARASARAOPETA ENGINEERING COLLEGE (Autonomous)</b>
-<span>Department of CSE (Emerging Technologies)</span>
-<small>Admin Panel - LabCare</small>
+<div id="loginDiv" class="card login">
+<h2>NEC LabCare - Login</h2>
+<select id="roleSelect" onchange="showStaff()" style="width:100%">
+<option value="">Select Role</option>
+<option value="HOD">HOD / Admin (All Labs)</option>
+<option value="STAFF">Programmer</option>
+</select><br><br>
+<div id="staffDiv" style="display:none">
+<select id="staffSelect" style="width:100%">
+<option>A.HARINI</option>
+<option>Y.MARY RANI</option>
+<option>T.JAGADEESWARI</option>
+<option>S.MARIYA DASU</option>
+<option>R.BHEEMA NAIK</option>
+</select><br><br>
 </div>
-<div style="display:flex"><a href="student.html">Student</a><a class="active">Admin</a></div>
+<button onclick="login()" style="width:100%">Login</button>
 </div>
 
-<div class="container">
-<div class="stats">
-<div class="stat"><b id="t">0</b><small>Total</small></div>
-<div class="stat"><b id="p">0</b><small>Pending</small></div>
-<div class="stat"><b id="s">0</b><small>Solved</small></div>
-</div>
-
-<div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-<h2 style="color:#1e3a8a">All Complaints</h2>
-<div><select id="filter" onchange="render()"><option value="All">All Status</option><option>Pending</option><option>Working</option><option>Solved</option></select> <select id="labF" onchange="render()"><option value="All">All Labs</option><option>CSE(ET)-1205 Lab</option><option>CSE(ET)-1206 Lab</option><option>CSE(ET)-3427 Lab</option><option>CSE(ET)-3305 Lab</option><option>CSE(ET)-3140 Lab</option></select></div>
-</div>
-<div id="list"></div>
-</div>
-<div class="footer">© 2026 NEC(A) | Admin Panel</div>
+<div id="mainDiv" style="display:none">
+<h2 id="welcome"></h2>
+<button onclick="location.reload()" style="background:#64748b">Logout</button>
+<hr>
+<div id="complaints"></div>
 </div>
 
 <script>
-function get(){return JSON.parse(localStorage.getItem('labComplaints')||'[]')}function save(d){localStorage.setItem('labComplaints',JSON.stringify(d))}
-function update(id,st){let d=get();let i=d.findIndex(x=>x.id==id);if(i>=0){d[i].status=st;save(d);render()}}
-function del(id){if(!confirm('Delete?'))return;let d=get().filter(x=>x.id!=id);save(d);render()}
-function render(){let d=get();document.getElementById('t').innerText=d.length;document.getElementById('p').innerText=d.filter(x=>x.status=='Pending').length;document.getElementById('s').innerText=d.filter(x=>x.status=='Solved').length;let f=document.getElementById('filter').value,lf=document.getElementById('labF').value;let fd=d.filter(x=>(f=='All'||x.status==f)&&(lf=='All'||x.lab==lf));document.getElementById('list').innerHTML=fd.map(c=>`
-<div class="complaint">
-<div style="display:flex;justify-content:space-between"><b>${c.lab} - ${c.pc} (${c.roll})</b><span class="badge ${c.status.toLowerCase()}">${c.status}</span></div>
-<div style="margin:8px 0"><b>${c.type}</b><br><small>${c.desc}</small></div>
-${c.photo?`<img src="${c.photo}"><br>`:''}
-<small>${c.time}</small>
-<div style="margin-top:10px;display:flex;gap:8px">
-<button class="btn-work" onclick="update(${c.id},'Working')">Working</button>
-<button class="btn-solve" onclick="update(${c.id},'Solved')">Solved</button>
-<button class="btn-del" onclick="del(${c.id})">Delete</button>
-</div>
-</div>`).join('')||'<p style="color:#888;margin-top:10px">No complaints found</p>';}
-render();
+const LAB_STAFF = {
+  "CSE(ET)-3427 LAB": "A.HARINI",
+  "CSE(ET)-3305 LAB": "Y.MARY RANI",
+  "CSE(ET)-3204 LAB": "T.JAGADEESWARI",
+  "CSE(ET)-1205 LAB": "S.MARIYA DASU",
+  "CSE(ET)-1206 LAB": "R.BHEEMA NAIK"
+};
+const STAFF_LAB = {};
+for(let lab in LAB_STAFF){ STAFF_LAB[LAB_STAFF[lab]] = lab }
+let currentUser=null, currentRole=null;
+
+function showStaff(){ document.getElementById('staffDiv').style.display = document.getElementById('roleSelect').value==='STAFF'?'block':'none'; }
+function login(){
+  currentRole=document.getElementById('roleSelect').value;
+  if(!currentRole) return alert("Select Role");
+  if(currentRole==='STAFF') currentUser=document.getElementById('staffSelect').value;
+  else currentUser="HOD";
+  document.getElementById('loginDiv').style.display='none';
+  document.getElementById('mainDiv').style.display='block';
+  document.getElementById('welcome').innerText = currentRole==='HOD'? "HOD Panel - All 5 Labs" : `${currentUser} - ${STAFF_LAB[currentUser]}`;
+  render();
+}
+function getComplaints(){ return JSON.parse(localStorage.getItem('nec_complaints')||'[]'); }
+function saveComplaints(c){ localStorage.setItem('nec_complaints', JSON.stringify(c)); }
+
+function render(){
+  let all=getComplaints();
+  let filtered = currentRole==='HOD'? all : all.filter(c=> c.lab.trim()===STAFF_LAB[currentUser].trim());
+  let html='';
+  if(filtered.length===0) html='<div class="card">No complaints in your lab</div>';
+  filtered.forEach(c=>{
+    let realIndex = all.indexOf(c);
+    let assignedTo = LAB_STAFF[c.lab] || LAB_STAFF[c.lab.trim()] || "Not Assigned";
+    html+=`<div class="card">
+    <b>${c.lab}</b> | PC-${c.pc} <span class="badge ${c.status==='Solved'?'solved':c.status==='Assigned'?'assigned':'pending'}">${c.status}</span><br>
+    <small>Issue: ${c.issue} | Student: ${c.student} | ${c.date||''}</small><br><br>
+    <b>Assigned To:</b> ${assignedTo}<br><br>
+    ${(currentRole==='HOD' || currentUser===assignedTo)? `
+    <select id="s${realIndex}"><option ${c.status==='Pending'?'selected':''}>Pending</option><option ${c.status==='Assigned'?'selected':''}>Assigned</option><option ${c.status==='Solved'?'selected':''}>Solved</option></select>
+    <button onclick="updateStatus(${realIndex})">Update Status</button>` : `<i style="color:red">Only ${assignedTo} can solve this complaint</i>`}
+    </div>`;
+  });
+  document.getElementById('complaints').innerHTML=html;
+}
+function updateStatus(idx){
+  let all=getComplaints();
+  let newStatus=document.getElementById('s'+idx).value;
+  all[idx].status=newStatus;
+  all[idx].solvedBy=currentUser;
+  all[idx].solvedAt=new Date().toLocaleString();
+  saveComplaints(all);
+  alert(`Status updated to ${newStatus} by ${currentUser}`);
+  render();
+}
 </script>
 </body>
 </html>
