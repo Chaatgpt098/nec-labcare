@@ -1,30 +1,46 @@
 <!DOCTYPE html>
-<html><head><title>NEC LabCare Admin</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{font-family:Arial;background:#f1f5f9;padding:15px}.card{background:white;padding:18px;border-radius:12px;margin-bottom:12px}input,select,button{padding:10px;border-radius:6px;border:1px solid #ccc;width:100%;box-sizing:border-box;margin-top:8px}button{background:#1e3a8a;color:white;font-weight:bold;cursor:pointer}.login{max-width:400px;margin:50px auto}</style></head><body>
-<div id="loginDiv" class="card login"><h2>NEC LabCare - Secure Login</h2>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>NEC LabCare Admin</title><style>
+*{box-sizing:border-box;font-family:'Segoe UI',Arial}body{margin:0;background:#f8fafc;color:#1e293b}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a8a,#3b82f6);padding:15px}
+.login-card{background:white;width:100%;max-width:380px;padding:28px;border-radius:16px;box-shadow:0 10px 30px #0003;text-align:center}
+.login-card h2{margin:0 0 6px;color:#1e3a8a}.login-card p{color:#64748b;font-size:13px;margin-bottom:18px}
+input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-top:10px;font-size:14px}
+.btn{width:100%;padding:12px;border:0;border-radius:10px;font-weight:700;cursor:pointer;margin-top:12px}.btn-primary{background:#1e3a8a;color:white}
+.pass-wrap{position:relative;margin-top:10px}.pass-wrap input{margin:0;padding-right:45px}.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;user-select:none}
+.header{background:#1e3a8a;color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.header h3{margin:0}.header div{display:flex;gap:8px}
+.btn-sm{padding:8px 14px;border-radius:8px;border:0;cursor:pointer;font-size:13px;font-weight:600}.btn-gray{background:#e2e8f0}.btn-red{background:#fee2e2;color:#dc2626}
+.container{max-width:900px;margin:20px auto;padding:0 15px}
+.card{background:white;border-radius:14px;padding:16px;box-shadow:0 2px 10px #0001;margin-bottom:14px;border-left:5px solid #3b82f6}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}.pending{background:#fef3c7;color:#92400e}.assigned{background:#dbeafe;color:#1e40af}.solved{background:#dcfce7;color:#166534}
+.meta{font-size:13px;color:#64748b;margin:6px 0}.row{display:flex;gap:8px;margin-top:10px}.row select{flex:1;margin:0}.row button{width:auto;padding:8px 16px;margin:0;background:#1e3a8a;color:white;border:0;border-radius:8px;font-weight:600;cursor:pointer}
+.empty{text-align:center;padding:40px;color:#94a3b8}
+</style></head><body>
+<div id="loginDiv" class="login-wrap"><div class="login-card"><h2>NEC LabCare</h2><p>Secure Admin Panel - CSE(ET) Labs</p>
 <select id="roleSelect" onchange="showStaff()"><option value="">Select Role</option><option value="HOD">HOD / Admin</option><option value="STAFF">Programmer</option></select>
-<div id="staffDiv" style="display:none"><select id="staffSelect"><option>A.HARINI</option><option>Y.MARY RANI</option><option>T.JAGADEESWARI</option><option>S.MARIYA DASU</option><option>R.BHEEMA NAIK</option></select></div>
-<input type="password" id="pass" placeholder="Enter Password">
-<button onclick="login()">Login</button>
-<p style="font-size:12px;color:gray">HOD pwd: hod@nec | Staff pwd: nec@123</p>
-</div>
-<div id="mainDiv" style="display:none"><h2 id="welcome"></h2><button onclick="location.reload()" style="background:#64748b">Logout</button> <button onclick="clearAll()" style="background:red">Clear</button><hr><div id="complaints"></div></div>
+<div id="staffDiv" style="display:none"><select id="staffSelect"><option>A.HARINI - 3427 LAB</option><option>Y.MARY RANI - 3305 LAB</option><option>T.JAGADEESWARI - 3204 LAB</option><option>S.MARIYA DASU - 1205 LAB</option><option>R.BHEEMA NAIK - 1206 LAB</option></select></div>
+<div class="pass-wrap"><input type="password" id="pass" placeholder="Enter Password"><span class="eye" onclick="togglePass()" id="eyeIcon">👁️</span></div>
+<button class="btn btn-primary" onclick="login()">Secure Login</button></div></div>
+<div id="mainDiv" style="display:none"><div class="header"><h3 id="welcome"></h3><div><button class="btn-sm btn-gray" onclick="location.reload()">Logout</button><button class="btn-sm btn-red" onclick="clearAll()">Clear All</button></div></div><div class="container"><div id="complaints"></div></div></div>
 <script>
 const LAB_STAFF={"CSE(ET)-3427 LAB":"A.HARINI","CSE(ET)-3305 LAB":"Y.MARY RANI","CSE(ET)-3204 LAB":"T.JAGADEESWARI","CSE(ET)-1205 LAB":"S.MARIYA DASU","CSE(ET)-1206 LAB":"R.BHEEMA NAIK"};
+const SHORT_MAP={"A.HARINI - 3427 LAB":"A.HARINI","Y.MARY RANI - 3305 LAB":"Y.MARY RANI","T.JAGADEESWARI - 3204 LAB":"T.JAGADEESWARI","S.MARIYA DASU - 1205 LAB":"S.MARIYA DASU","R.BHEEMA NAIK - 1206 LAB":"R.BHEEMA NAIK"};
 const STAFF_LAB={};for(let l in LAB_STAFF){STAFF_LAB[LAB_STAFF[l]]=l}
 let currentUser=null,currentRole=null;
 function showStaff(){document.getElementById('staffDiv').style.display=document.getElementById('roleSelect').value==='STAFF'?'block':'none'}
+function togglePass(){let p=document.getElementById('pass');let e=document.getElementById('eyeIcon');if(p.type==='password'){p.type='text';e.innerText='🙈';}else{p.type='password';e.innerText='👁️';}}
 function login(){
-  currentRole=document.getElementById('roleSelect').value;
-  let pwd=document.getElementById('pass').value;
-  if(!currentRole)return alert("Select Role");
-  if(currentRole==='HOD' && pwd!=='hod@nec')return alert("Wrong HOD Password!");
-  if(currentRole==='STAFF' && pwd!=='nec@123')return alert("Wrong Staff Password!");
-  if(currentRole==='STAFF')currentUser=document.getElementById('staffSelect').value; else currentUser="HOD";
+  currentRole=document.getElementById('roleSelect').value;let pwd=document.getElementById('pass').value;
+  if(!currentRole)return alert("Select Role");if(currentRole==='HOD'&&pwd!=='hod@nec')return alert("Wrong Password");if(currentRole==='STAFF'&&pwd!=='nec@123')return alert("Wrong Password");
+  let raw=document.getElementById('staffSelect').value;currentUser=currentRole==='HOD'?"HOD":(SHORT_MAP[raw]||raw);
   document.getElementById('loginDiv').style.display='none';document.getElementById('mainDiv').style.display='block';
-  document.getElementById('welcome').innerText=currentRole==='HOD'?"HOD Panel - All Labs":`${currentUser} - ${STAFF_LAB[currentUser]}`;
-  render();
+  document.getElementById('welcome').innerText=currentRole==='HOD'?"HOD Panel - All 5 Labs":`${currentUser} - ${STAFF_LAB[currentUser]}`;render();
 }
 function getC(){return JSON.parse(localStorage.getItem('nec_complaints')||'[]')}function saveC(c){localStorage.setItem('nec_complaints',JSON.stringify(c))}
-function render(){let all=getC();let f=currentRole==='HOD'?all:all.filter(c=>c.lab.trim()===STAFF_LAB[currentUser].trim());document.getElementById('complaints').innerHTML=f.map((c,i)=>{let idx=all.indexOf(c);return `<div class=card><b>${c.lab}</b> | PC-${c.pc}<br>Issue:${c.issue} | ${c.student}<br>Assigned:${LAB_STAFF[c.lab]}<br>Status:${c.status}<br><select id=s${idx}><option ${c.status==='Pending'?'selected':''}>Pending</option><option ${c.status==='Assigned'?'selected':''}>Assigned</option><option ${c.status==='Solved'?'selected':''}>Solved</option></select><button onclick="let a=getC();a[${idx}].status=document.getElementById('s${idx}').value;saveC(a);render()">Update</button></div>`}).join('')||'No complaints'}
-function clearAll(){if(confirm("Delete all?")){localStorage.removeItem('nec_complaints');render()}}
+function render(){
+  let all=getC();let f=currentRole==='HOD'?all:all.filter(c=>c.lab.trim()===STAFF_LAB[currentUser].trim());
+  if(f.length===0){document.getElementById('complaints').innerHTML='<div class="card empty"><h3>No Complaints</h3><p>All labs working fine 🎉</p></div>';return;}
+  document.getElementById('complaints').innerHTML=f.map(c=>{let idx=all.indexOf(c);let col=c.status==='Solved'?'#22c55e':c.status==='Assigned'?'#3b82f6':'#f59e0b';return `<div class="card" style="border-left-color:${col}"><div style="display:flex;justify-content:space-between"><b>${c.lab} - PC ${c.pc}</b><span class="badge ${c.status.toLowerCase()}">${c.status}</span></div><div class="meta">Issue: <b>${c.issue}</b> | Student: ${c.student} | ${c.date||''}<br>Assigned To: <b style="color:#1e3a8a">${LAB_STAFF[c.lab]}</b></div><div class="row"><select id="s${idx}"><option ${c.status==='Pending'?'selected':''}>Pending</option><option ${c.status==='Assigned'?'selected':''}>Assigned</option><option ${c.status==='Solved'?'selected':''}>Solved</option></select><button onclick="let a=getC();a[${idx}].status=document.getElementById('s${idx}').value;a[${idx}].solvedBy=currentUser;saveC(a);render()">Update</button></div></div>`}).join('');
+}
+function clearAll(){if(confirm("Delete all complaints?")){localStorage.removeItem('nec_complaints');render()}}
 </script></body></html>
